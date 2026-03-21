@@ -26,21 +26,12 @@ body{
     box-shadow:0 0 30px #a855f7;
 }
 
-/* TELEFON */
 .telefonBox{
     display:flex;
     gap:10px;
 }
 
-select{
-    padding:10px;
-    border:none;
-    border-radius:8px;
-    background:#1a1a1a;
-    color:white;
-}
-
-input{
+select,input{
     width:100%;
     padding:12px;
     margin:10px 0;
@@ -100,7 +91,6 @@ input{
     transform:translateY(0);
 }
 
-/* TEXT */
 .linie{
     margin:8px 0;
     opacity:0;
@@ -136,7 +126,7 @@ input{
 
 <h3>Date client</h3>
 
-<input type="text" id="nume" placeholder="Nume">
+<input type="text" id="nume" placeholder="Nume" required>
 
 <div class="telefonBox">
 <select id="prefix">
@@ -151,8 +141,7 @@ id="telefon"
 placeholder="Telefon (9 sau 10 cifre)" 
 maxlength="10"
 pattern="[0-9]{9,10}"
-required
->
+required>
 </div>
 
 <h4>Plată</h4>
@@ -161,7 +150,7 @@ required
 
 <h4>Livrare</h4>
 <div class="optiune" onclick="selectLivrare('Ridicare', this)">🏠 Ridicare</div>
-<div class="optiune" onclick="selectLivrare('Curier', this)">🚚 Curier (+15)</div>
+<div class="optiune" onclick="selectLivrare('Curier', this)">🚚 Curier (+15 RON)</div>
 
 <button class="btn" onclick="genereaza()">Generează chitanța</button>
 
@@ -188,7 +177,7 @@ required
 </div>
 
 <script>
-emailjs.init("PUBLIC_KEY_TAU");
+emailjs.init("GNsJuo4zc-jQgAcPB");
 
 let plata=null;
 let livrare=null;
@@ -217,7 +206,7 @@ let nume=document.getElementById("nume").value;
 let tel=document.getElementById("telefon").value;
 let prefix=document.getElementById("prefix").value;
 
-if(!nume || tel.length!=10 || !plata || !livrare){
+if(!nume || tel.length<9 || !plata || !livrare){
     alert("Completează corect datele!");
     return;
 }
@@ -231,21 +220,27 @@ let pretInitial=parseFloat(localStorage.getItem("pretInitial"));
 let total=pret;
 if(livrare==="Curier") total+=15;
 
+// TVA
+let tva = total * 0.19;
+let faraTVA = total - tva;
+
 let linii=[
 `Serviciu: ${serviciu}`,
 `Nume: ${nume}`,
 `Telefon: ${telefonFinal}`,
 `Preț inițial: ${pretInitial} RON`,
 `Reducere: -${pretInitial-pret} RON`,
-`Plată: ${plata}`,
-`Livrare: ${livrare}`,
-`TOTAL: ${total} RON`
+`Fără TVA: ${faraTVA.toFixed(2)} RON`,
+`TVA (19%): ${tva.toFixed(2)} RON`,
+`TOTAL: ${total.toFixed(2)} RON`
 ];
 
 let ids=["l1","l2","l3","l4","l5","l6","l7","l8"];
 
 ids.forEach((id,i)=>{
-    document.getElementById(id).innerText=linii[i];
+    let el=document.getElementById(id);
+    el.innerText=linii[i];
+    el.classList.remove("show");
 });
 
 document.getElementById("overlay").classList.add("show");
@@ -255,35 +250,9 @@ ids.forEach((id,i)=>{
         document.getElementById(id).classList.add("show");
     }, i*250);
 });
-
 }
 
 // EMAIL
-function finalizare(){
-
-let nume=document.getElementById("nume").value;
-let tel=document.getElementById("prefix").value + document.getElementById("telefon").value;
-
-let serviciu=localStorage.getItem("serviciu");
-let pret=localStorage.getItem("pret");
-
-emailjs.send("SERVICE_ID","TEMPLATE_ID",{
-    nume:nume,
-    telefon:tel,
-    serviciu:serviciu,
-    total:pret,
-    plata:plata,
-    livrare:livrare
-})
-.then(()=>alert("Trimis!"));
-
-}
-</script>
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
-<script>
-emailjs.init("GNsJuo4zc-jQgAcPB");
-
 function finalizare(){
 
 let nume = document.getElementById("nume").value;
@@ -291,30 +260,24 @@ let tel = document.getElementById("prefix").value + document.getElementById("tel
 
 let serviciu = localStorage.getItem("serviciu");
 let pret = localStorage.getItem("pret");
-let plataSelectata = plata;
-let livrareSelectata = livrare;
-
-if(!nume || !tel){
-    alert("Completează toate câmpurile!");
-    return;
-}
 
 emailjs.send("service_zb0rhpr", "template_kze240g", {
     name: nume,
     phone: tel,
     service: serviciu,
     price: pret,
-    payment: plataSelectata,
-    delivery: livrareSelectata
+    payment: plata,
+    delivery: livrare
 })
-.then(function() {
-    alert("✅ Comanda a fost trimisă pe email!");
-}, function(error) {
+.then(()=>{
+    alert("✅ Comanda a fost trimisă!");
+})
+.catch(()=>{
     alert("❌ Eroare la trimitere!");
-    console.log(error);
 });
 
 }
 </script>
+
 </body>
 </html>
