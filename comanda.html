@@ -145,7 +145,14 @@ input{
 <option value="+49">🇩🇪 +49</option>
 </select>
 
-<input type="tel" id="telefon" placeholder="Telefon (10 cifre)" maxlength="10">
+<input 
+type="tel" 
+id="telefon" 
+placeholder="Telefon (9 sau 10 cifre)" 
+maxlength="10"
+pattern="[0-9]{9,10}"
+required
+>
 </div>
 
 <h4>Plată</h4>
@@ -272,6 +279,42 @@ emailjs.send("SERVICE_ID","TEMPLATE_ID",{
 
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
+<script>
+emailjs.init("GNsJuo4zc-jQgAcPB");
+
+function finalizare(){
+
+let nume = document.getElementById("nume").value;
+let tel = document.getElementById("prefix").value + document.getElementById("telefon").value;
+
+let serviciu = localStorage.getItem("serviciu");
+let pret = localStorage.getItem("pret");
+let plataSelectata = plata;
+let livrareSelectata = livrare;
+
+if(!nume || !tel){
+    alert("Completează toate câmpurile!");
+    return;
+}
+
+emailjs.send("service_zb0rhpr", "template_kze240g", {
+    name: nume,
+    phone: tel,
+    service: serviciu,
+    price: pret,
+    payment: plataSelectata,
+    delivery: livrareSelectata
+})
+.then(function() {
+    alert("✅ Comanda a fost trimisă pe email!");
+}, function(error) {
+    alert("❌ Eroare la trimitere!");
+    console.log(error);
+});
+
+}
+</script>
 </body>
 </html>
