@@ -18,7 +18,9 @@
 
 body {
     font-family:'Segoe UI',sans-serif;
-    background:#0a0a0a;
+    background-image: url("bg.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
     color:white;
     scroll-behavior:smooth;
 }
@@ -120,7 +122,7 @@ footer {
 /* PROMO */
 .promo {
     position: fixed;
-    top: 50%;
+    top: 20%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
     background: black;
@@ -181,7 +183,7 @@ Echipa noastră are experiență reală de minimum 5 ani și garantează rezulta
 <section class="section reverse">
 
 <div class="image" data-aos="fade-left">
-<img src="https://images.unsplash.com/photo-1587202372775-9893c9a54f7c">
+<img src="logo.png">
 </div>
 
 <div class="text social" data-aos="fade-right">
@@ -221,9 +223,10 @@ Echipa noastră are experiență reală de minimum 5 ani și garantează rezulta
 AOS.init({ duration:1000, once:true });
 
 // PROMO + CONFETTI
-setTimeout(()=>{
-    document.getElementById("promo").style.display="none";
-},10000);
+// setTimeout(()=>{
+//     document.getElementById("promo").style.display="none";
+//     pieces = [];
+// },10000);
 
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
@@ -259,10 +262,6 @@ function draw(){
     requestAnimationFrame(draw);
 }
 draw();
-
-setTimeout(()=>{
-    pieces = [];
-},10000);
 </script>
 
 </body>
