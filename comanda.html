@@ -17,7 +17,6 @@ body{
     padding:20px;
 }
 
-/* FORM */
 .form{
     background:#111;
     padding:25px;
@@ -32,16 +31,15 @@ body{
 }
 
 select,input{
-    width:100%;
     padding:12px;
-    margin:10px 0;
     border:none;
     border-radius:8px;
     background:#1a1a1a;
     color:white;
 }
 
-/* OPTIUNI */
+input{ width:100%; }
+
 .optiune{
     padding:10px;
     margin:5px 0;
@@ -54,24 +52,27 @@ select,input{
     border:2px solid #a855f7;
 }
 
-/* OVERLAY */
 .overlay{
     position:fixed;
     top:0;
     left:0;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.8);
-    backdrop-filter:blur(10px);
+    background:rgba(0,0,0,0.9);
     display:flex;
     justify-content:center;
     align-items:center;
     opacity:0;
     pointer-events:none;
     transition:0.5s;
+    z-index:9999;
 }
 
-/* CHITANTA */
+.overlay.show{
+    opacity:1;
+    pointer-events:auto;
+}
+
 .chitanta{
     background:#111;
     padding:30px;
@@ -82,17 +83,12 @@ select,input{
     transition:1s;
 }
 
-.overlay.show{
-    opacity:1;
-    pointer-events:auto;
-}
-
 .overlay.show .chitanta{
     transform:translateY(0);
 }
 
 .linie{
-    margin:8px 0;
+    margin:6px 0;
     opacity:0;
 }
 
@@ -105,6 +101,7 @@ select,input{
 }
 
 .reducere{color:#22c55e;}
+.tva{color:#facc15;}
 .total{color:#a855f7;font-weight:bold;}
 
 .btn{
@@ -123,7 +120,6 @@ select,input{
 <body>
 
 <div class="form">
-
 <h3>Date client</h3>
 
 <input type="text" id="nume" placeholder="Nume" required>
@@ -135,28 +131,21 @@ select,input{
 <option value="+49">🇩🇪 +49</option>
 </select>
 
-<input 
-type="tel" 
-id="telefon" 
-placeholder="Telefon (9 sau 10 cifre)" 
-maxlength="10"
-pattern="[0-9]{9,10}"
-required>
+<input type="tel" id="telefon" placeholder="Telefon (9-10 cifre)" required>
 </div>
 
 <h4>Plată</h4>
-<div class="optiune" onclick="selectPlata('Cash', this)">💵 Cash</div>
-<div class="optiune" onclick="selectPlata('Card', this)">💳 Card</div>
+<div class="optiune" onclick="selectPlata('Cash',this)">💵 Cash</div>
+<div class="optiune" onclick="selectPlata('Card',this)">💳 Card</div>
 
 <h4>Livrare</h4>
-<div class="optiune" onclick="selectLivrare('Ridicare', this)">🏠 Ridicare</div>
-<div class="optiune" onclick="selectLivrare('Curier', this)">🚚 Curier (+15 RON)</div>
+<div class="optiune" onclick="selectLivrare('Ridicare',this)">🏠 Ridicare</div>
+<div class="optiune" onclick="selectLivrare('Curier',this)">🚚 Curier (+15)</div>
 
 <button class="btn" onclick="genereaza()">Generează chitanța</button>
-
 </div>
 
-<!-- OVERLAY -->
+<!-- CHITANTA -->
 <div class="overlay" id="overlay">
 <div class="chitanta">
 
@@ -167,9 +156,10 @@ required>
 <div class="linie" id="l3"></div>
 <div class="linie" id="l4"></div>
 <div class="linie reducere" id="l5"></div>
-<div class="linie" id="l6"></div>
+<div class="linie tva" id="l6"></div>
 <div class="linie" id="l7"></div>
-<div class="linie total" id="l8"></div>
+<div class="linie" id="l8"></div>
+<div class="linie total" id="l9"></div>
 
 <button class="btn" onclick="finalizare()">Finalizează</button>
 
@@ -182,6 +172,7 @@ emailjs.init("GNsJuo4zc-jQgAcPB");
 let plata=null;
 let livrare=null;
 
+// SELECT PLATA
 function selectPlata(val,el){
     plata=val;
     document.querySelectorAll('.optiune').forEach(e=>{
@@ -191,6 +182,7 @@ function selectPlata(val,el){
     el.classList.add('selectat');
 }
 
+// SELECT LIVRARE
 function selectLivrare(val,el){
     livrare=val;
     document.querySelectorAll('.optiune').forEach(e=>{
@@ -200,29 +192,35 @@ function selectLivrare(val,el){
     el.classList.add('selectat');
 }
 
+// LIMITARE TELEFON 🔥
+window.onload = function(){
+    document.getElementById("telefon").addEventListener("input", function () {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+    });
+}
+
+// GENERARE CHITANTA
 function genereaza(){
 
 let nume=document.getElementById("nume").value;
 let tel=document.getElementById("telefon").value;
 let prefix=document.getElementById("prefix").value;
 
-if(!nume || tel.length<9 || !plata || !livrare){
-    alert("Completează corect datele!");
+if(!nume || tel.length < 9 || tel.length > 10 || !plata || !livrare){
+    alert("Completează corect!");
     return;
 }
 
-let telefonFinal=prefix + tel;
+let telefonFinal=prefix+tel;
 
 let serviciu=localStorage.getItem("serviciu");
 let pret=parseFloat(localStorage.getItem("pret"));
 let pretInitial=parseFloat(localStorage.getItem("pretInitial"));
 
-let total=pret;
-if(livrare==="Curier") total+=15;
+let tva=Math.round(pret*0.19);
+let total=pret+tva;
 
-// TVA
-let tva = total * 0.19;
-let faraTVA = total - tva;
+if(livrare==="Curier") total+=15;
 
 let linii=[
 `Serviciu: ${serviciu}`,
@@ -230,17 +228,16 @@ let linii=[
 `Telefon: ${telefonFinal}`,
 `Preț inițial: ${pretInitial} RON`,
 `Reducere: -${pretInitial-pret} RON`,
-`Fără TVA: ${faraTVA.toFixed(2)} RON`,
-`TVA (19%): ${tva.toFixed(2)} RON`,
-`TOTAL: ${total.toFixed(2)} RON`
+`TVA (19%): ${tva} RON`,
+`Plată: ${plata}`,
+`Livrare: ${livrare}`,
+`TOTAL: ${total} RON`
 ];
 
-let ids=["l1","l2","l3","l4","l5","l6","l7","l8"];
+let ids=["l1","l2","l3","l4","l5","l6","l7","l8","l9"];
 
 ids.forEach((id,i)=>{
-    let el=document.getElementById(id);
-    el.innerText=linii[i];
-    el.classList.remove("show");
+    document.getElementById(id).innerText=linii[i];
 });
 
 document.getElementById("overlay").classList.add("show");
@@ -248,34 +245,29 @@ document.getElementById("overlay").classList.add("show");
 ids.forEach((id,i)=>{
     setTimeout(()=>{
         document.getElementById(id).classList.add("show");
-    }, i*250);
+    }, i*200);
 });
 }
 
-// EMAIL
+// TRIMITERE EMAIL
 function finalizare(){
 
-let nume = document.getElementById("nume").value;
-let tel = document.getElementById("prefix").value + document.getElementById("telefon").value;
+let nume=document.getElementById("nume").value;
+let tel=document.getElementById("prefix").value + document.getElementById("telefon").value;
 
-let serviciu = localStorage.getItem("serviciu");
-let pret = localStorage.getItem("pret");
+let serviciu=localStorage.getItem("serviciu");
+let pret=localStorage.getItem("pret");
 
-emailjs.send("service_zb0rhpr", "template_kze240g", {
-    name: nume,
-    phone: tel,
-    service: serviciu,
-    price: pret,
-    payment: plata,
-    delivery: livrare
+emailjs.send("service_zb0rhpr","template_kze240g",{
+    nume:nume,
+    telefon:tel,
+    serviciu:serviciu,
+    pret:pret,
+    plata:plata,
+    livrare:livrare
 })
-.then(()=>{
-    alert("✅ Comanda a fost trimisă!");
-})
-.catch(()=>{
-    alert("❌ Eroare la trimitere!");
-});
-
+.then(()=>alert("✅ Comanda trimisă!"))
+.catch(()=>alert("❌ Eroare la trimitere!"));
 }
 </script>
 
