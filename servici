@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<title>Servicii</title>
+
+<style>
+body{
+    font-family:'Segoe UI';
+    background:linear-gradient(135deg,#0a0a0a,#1a0033);
+    color:white;
+}
+
+h1{
+    text-align:center;
+    margin-top:40px;
+}
+
+.serviciu{
+    margin:20px auto;
+    width:80%;
+    padding:20px;
+    background:#111;
+    border-radius:10px;
+    box-shadow:0 0 15px #a855f7;
+    cursor:pointer;
+
+    opacity:0;
+    transform:translateX(-100px);
+    animation: slideIn 0.8s forwards;
+}
+
+.optiuni{
+    display:none;
+}
+
+.opt{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px;
+    margin:10px;
+    background:#1a1a1a;
+    border-left:3px solid #a855f7;
+    cursor:pointer;
+
+    opacity:0;
+    transform:translateX(-100px);
+    animation: slideIn 0.8s forwards;
+}
+
+.pret{
+    color:#a855f7;
+    font-weight:bold;
+}
+
+.vechi{
+    text-decoration:line-through;
+    color:#888;
+    margin-right:10px;
+}
+
+.selectat{
+    border:2px solid #a855f7;
+}
+
+@keyframes slideIn{
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+
+/* BUTON */
+.plataBar{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#0a0a0a;
+    padding:15px;
+    text-align:center;
+}
+
+.plataBar button{
+    padding:15px 40px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    background:#a855f7;
+    color:white;
+}
+</style>
+
+<script>
+let serviciuSelectat = null;
+
+// DESCHIDE DOAR UNA
+function toggle(id){
+    document.querySelectorAll('.optiuni').forEach(el=>{
+        el.style.display = "none";
+    });
+
+    document.getElementById(id).style.display = "block";
+}
+
+// SELECTARE
+function alege(serviciu, pretInitial, element){
+    let pretFinal = pretInitial / 2;
+
+    serviciuSelectat = serviciu;
+
+    document.querySelectorAll('.opt').forEach(el=>{
+        el.classList.remove('selectat');
+    });
+
+    element.classList.add('selectat');
+
+    localStorage.setItem("serviciu", serviciu);
+    localStorage.setItem("pret", pretFinal);
+    localStorage.setItem("pretInitial", pretInitial);
+}
+
+// MERGI LA COMANDA
+function mergiLaComanda(){
+    if(!serviciuSelectat){
+        alert("Selectează un serviciu!");
+        return;
+    }
+
+    window.location.href = "comanda.html";
+}
+
+// ANIMATIE
+window.onload = function(){
+    document.querySelectorAll('.serviciu').forEach((el,i)=>{
+        el.style.animationDelay = (i*0.2)+"s";
+    });
+}
+</script>
+
+</head>
+
+<body>
+
+<h1>Serviciile Noastre</h1>
+
+<!-- PC -->
+<div class="serviciu" onclick="toggle('pcBox')">🖥️ Mentenanță PC</div>
+<div id="pcBox" class="optiuni">
+<div class="opt" onclick="event.stopPropagation(); alege('PC Standard',300,this)">
+PC Standard
+<span><span class="vechi">300</span> <span class="pret">150 RON</span></span>
+</div>
+
+<div class="opt" onclick="event.stopPropagation(); alege('PC Premium',500,this)">
+PC Premium
+<span><span class="vechi">500</span> <span class="pret">250 RON</span></span>
+</div>
+</div>
+
+<!-- LAPTOP -->
+<div class="serviciu" onclick="toggle('laptopBox')">💻 Mentenanță Laptop</div>
+<div id="laptopBox" class="optiuni">
+<div class="opt" onclick="event.stopPropagation(); alege('Laptop Standard',250,this)">
+Laptop Standard
+<span><span class="vechi">250</span> <span class="pret">125 RON</span></span>
+</div>
+
+<div class="opt" onclick="event.stopPropagation(); alege('Laptop Premium',400,this)">
+Laptop Premium
+<span><span class="vechi">400</span> <span class="pret">200 RON</span></span>
+</div>
+</div>
+
+<!-- CONSOLE -->
+<div class="serviciu" onclick="toggle('consoleBox')">🎮 Mentenanță Console</div>
+<div id="consoleBox" class="optiuni">
+<div class="opt" onclick="event.stopPropagation(); alege('Consolă Standard',350,this)">
+Consolă Standard
+<span><span class="vechi">350</span> <span class="pret">175 RON</span></span>
+</div>
+
+<div class="opt" onclick="event.stopPropagation(); alege('Consolă Avansat',450,this)">
+Consolă Avansat
+<span><span class="vechi">450</span> <span class="pret">225 RON</span></span>
+</div>
+</div>
+
+<!-- EXTRA (FIXAT 100%) -->
+<div class="serviciu" onclick="toggle('extraBox')">⚙️ Servicii Extra</div>
+<div id="extraBox" class="optiuni">
+
+<div class="opt" onclick="event.stopPropagation(); alege('Instalare Windows',200,this)">
+Instalare Windows
+<span><span class="vechi">200</span> <span class="pret">100 RON</span></span>
+</div>
+
+<div class="opt" onclick="event.stopPropagation(); alege('Asamblare Calculator',300,this)">
+Asamblare Calculator
+<span><span class="vechi">300</span> <span class="pret">150 RON</span></span>
+</div>
+
+</div>
+
+<!-- BUTON -->
+<div class="plataBar">
+<button onclick="mergiLaComanda()">Continuă spre plată</button>
+</div>
+
+</body>
+</html>

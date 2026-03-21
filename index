@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<title>NextGen IT Service</title>
+
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<style>
+* {
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body {
+    font-family:'Segoe UI',sans-serif;
+    background:#0a0a0a;
+    color:white;
+    scroll-behavior:smooth;
+}
+
+/* HERO */
+.hero {
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    background:url("https://images.unsplash.com/photo-1587202372775-9893c9a54f7c") center/cover;
+}
+
+.hero h1 {
+    font-size:70px;
+    text-shadow:0 0 25px #a855f7;
+    animation:fadeIn 1.5s ease;
+}
+
+.hero p {
+    margin:20px 0;
+    font-size:22px;
+    animation:fadeIn 2s ease;
+}
+
+.btn {
+    padding:15px 30px;
+    background:#a855f7;
+    border-radius:10px;
+    text-decoration:none;
+    color:white;
+    box-shadow:0 0 20px #a855f7;
+    transition:0.3s;
+}
+
+.btn:hover {
+    transform:scale(1.1);
+}
+
+/* SECTIONS */
+.section {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:100px 80px;
+    gap:50px;
+}
+
+.reverse {
+    flex-direction:row-reverse;
+}
+
+.text {
+    width:50%;
+}
+
+.text h2 {
+    font-size:42px;
+    margin-bottom:20px;
+    color:#a855f7;
+}
+
+.text p {
+    font-size:18px;
+    line-height:1.6;
+}
+
+/* IMAGES */
+.image {
+    width:50%;
+}
+
+.image img {
+    width:100%;
+    border-radius:15px;
+    box-shadow:0 0 30px rgba(168,85,247,0.4);
+    transition:0.4s;
+}
+
+.image img:hover {
+    transform:scale(1.05);
+}
+
+/* SOCIAL */
+.social span {
+    color:#a855f7;
+    font-weight:bold;
+}
+
+/* FOOTER */
+footer {
+    background:linear-gradient(90deg,#000,#0f172a);
+    text-align:center;
+    padding:30px;
+}
+
+/* PROMO */
+.promo {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: black;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    z-index: 9999;
+    box-shadow: 0 0 40px #a855f7;
+    animation: popup 1s forwards;
+}
+
+@keyframes popup {
+    to { transform: translate(-50%, -50%) scale(1); }
+}
+
+#confetti {
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+}
+
+/* ANIMATIONS */
+@keyframes fadeIn {
+    from {opacity:0; transform:translateY(30px);}
+    to {opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<!-- HERO -->
+<section class="hero">
+<h1>NextGen IT Service</h1>
+<p>Experiență • Performanță • Profesionalism</p>
+<a href="servicii.html" class="btn">Vezi Servicii</a>
+</section>
+
+<!-- EXPERIENȚĂ -->
+<section class="section">
+<div class="image" data-aos="fade-right">
+<img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8">
+</div>
+
+<div class="text" data-aos="fade-left">
+<h2>Experiență</h2>
+<p>
+La NextGen IT oferim servicii profesionale de mentenanță și reparații.
+Echipa noastră are experiență reală de minimum 5 ani și garantează rezultate de top.
+</p>
+</div>
+</section>
+
+<!-- CONTACT -->
+<section class="section reverse">
+
+<div class="image" data-aos="fade-left">
+<img src="https://images.unsplash.com/photo-1587202372775-9893c9a54f7c">
+</div>
+
+<div class="text social" data-aos="fade-right">
+<h2>Unde ne puteți găsi</h2>
+
+<p>Ne puteți urmări aici:</p>
+
+<div style="display:flex; align-items:center; gap:15px; margin-top:10px;">
+<img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" width="40">
+<p><span>Instagram:</span> Nextgen.it.service</p>
+</div>
+
+<div style="display:flex; align-items:center; gap:15px; margin-top:10px;">
+<img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" width="40">
+<p><span>TikTok:</span> NewGen.IT.Service</p>
+</div>
+
+</div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+© 2026 NextGen IT Service • Calitate maximă, preț corect
+</footer>
+
+<!-- PROMO -->
+<div id="promo" class="promo">
+<h1>🔥 REDUCERE 50% 🔥</h1>
+<p>Toate serviciile sunt la jumătate de preț timp de 1 lună!</p>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init({ duration:1000, once:true });
+
+// PROMO + CONFETTI
+setTimeout(()=>{
+    document.getElementById("promo").style.display="none";
+},10000);
+
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let pieces = [];
+
+for(let i=0;i<150;i++){
+    pieces.push({
+        x: Math.random()*canvas.width,
+        y: Math.random()*-canvas.height,
+        size: Math.random()*6+2,
+        speed: Math.random()*4+2
+    });
+}
+
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    pieces.forEach(p=>{
+        ctx.fillStyle = "#a855f7";
+        ctx.fillRect(p.x,p.y,p.size,p.size);
+        p.y += p.speed;
+
+        if(p.y > canvas.height){
+            p.y = -10;
+            p.x = Math.random()*canvas.width;
+        }
+    });
+
+    requestAnimationFrame(draw);
+}
+draw();
+
+setTimeout(()=>{
+    pieces = [];
+},10000);
+</script>
+
+</body>
+</html>

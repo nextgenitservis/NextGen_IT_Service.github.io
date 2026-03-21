@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<title>Comandă</title>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<style>
+body{
+    font-family:'Segoe UI';
+    background:linear-gradient(135deg,#0a0a0a,#1a0033);
+    color:white;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:20px;
+}
+
+/* FORM */
+.form{
+    background:#111;
+    padding:25px;
+    border-radius:15px;
+    width:350px;
+    box-shadow:0 0 30px #a855f7;
+}
+
+/* TELEFON */
+.telefonBox{
+    display:flex;
+    gap:10px;
+}
+
+select{
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    background:#1a1a1a;
+    color:white;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    border-radius:8px;
+    background:#1a1a1a;
+    color:white;
+}
+
+/* OPTIUNI */
+.optiune{
+    padding:10px;
+    margin:5px 0;
+    background:#1a1a1a;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.optiune.selectat{
+    border:2px solid #a855f7;
+}
+
+/* OVERLAY */
+.overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.8);
+    backdrop-filter:blur(10px);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    opacity:0;
+    pointer-events:none;
+    transition:0.5s;
+}
+
+/* CHITANTA */
+.chitanta{
+    background:#111;
+    padding:30px;
+    border-radius:15px;
+    width:350px;
+    box-shadow:0 0 40px #a855f7;
+    transform:translateY(200px);
+    transition:1s;
+}
+
+.overlay.show{
+    opacity:1;
+    pointer-events:auto;
+}
+
+.overlay.show .chitanta{
+    transform:translateY(0);
+}
+
+/* TEXT */
+.linie{
+    margin:8px 0;
+    opacity:0;
+}
+
+.linie.show{
+    animation:fadeIn 0.4s forwards;
+}
+
+@keyframes fadeIn{
+    to{opacity:1;}
+}
+
+.reducere{color:#22c55e;}
+.total{color:#a855f7;font-weight:bold;}
+
+.btn{
+    margin-top:15px;
+    width:100%;
+    padding:15px;
+    background:#a855f7;
+    border:none;
+    border-radius:10px;
+    color:white;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="form">
+
+<h3>Date client</h3>
+
+<input type="text" id="nume" placeholder="Nume">
+
+<div class="telefonBox">
+<select id="prefix">
+<option value="+40">🇷🇴 +40</option>
+<option value="+44">🇬🇧 +44</option>
+<option value="+49">🇩🇪 +49</option>
+</select>
+
+<input type="tel" id="telefon" placeholder="Telefon (10 cifre)" maxlength="10">
+</div>
+
+<h4>Plată</h4>
+<div class="optiune" onclick="selectPlata('Cash', this)">💵 Cash</div>
+<div class="optiune" onclick="selectPlata('Card', this)">💳 Card</div>
+
+<h4>Livrare</h4>
+<div class="optiune" onclick="selectLivrare('Ridicare', this)">🏠 Ridicare</div>
+<div class="optiune" onclick="selectLivrare('Curier', this)">🚚 Curier (+15)</div>
+
+<button class="btn" onclick="genereaza()">Generează chitanța</button>
+
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay">
+<div class="chitanta">
+
+<h2>🧾 Chitanță</h2>
+
+<div class="linie" id="l1"></div>
+<div class="linie" id="l2"></div>
+<div class="linie" id="l3"></div>
+<div class="linie" id="l4"></div>
+<div class="linie reducere" id="l5"></div>
+<div class="linie" id="l6"></div>
+<div class="linie" id="l7"></div>
+<div class="linie total" id="l8"></div>
+
+<button class="btn" onclick="finalizare()">Finalizează</button>
+
+</div>
+</div>
+
+<script>
+emailjs.init("PUBLIC_KEY_TAU");
+
+let plata=null;
+let livrare=null;
+
+function selectPlata(val,el){
+    plata=val;
+    document.querySelectorAll('.optiune').forEach(e=>{
+        if(e.innerText.includes("Cash")||e.innerText.includes("Card"))
+            e.classList.remove('selectat');
+    });
+    el.classList.add('selectat');
+}
+
+function selectLivrare(val,el){
+    livrare=val;
+    document.querySelectorAll('.optiune').forEach(e=>{
+        if(e.innerText.includes("Ridicare")||e.innerText.includes("Curier"))
+            e.classList.remove('selectat');
+    });
+    el.classList.add('selectat');
+}
+
+function genereaza(){
+
+let nume=document.getElementById("nume").value;
+let tel=document.getElementById("telefon").value;
+let prefix=document.getElementById("prefix").value;
+
+if(!nume || tel.length!=10 || !plata || !livrare){
+    alert("Completează corect datele!");
+    return;
+}
+
+let telefonFinal=prefix + tel;
+
+let serviciu=localStorage.getItem("serviciu");
+let pret=parseFloat(localStorage.getItem("pret"));
+let pretInitial=parseFloat(localStorage.getItem("pretInitial"));
+
+let total=pret;
+if(livrare==="Curier") total+=15;
+
+let linii=[
+`Serviciu: ${serviciu}`,
+`Nume: ${nume}`,
+`Telefon: ${telefonFinal}`,
+`Preț inițial: ${pretInitial} RON`,
+`Reducere: -${pretInitial-pret} RON`,
+`Plată: ${plata}`,
+`Livrare: ${livrare}`,
+`TOTAL: ${total} RON`
+];
+
+let ids=["l1","l2","l3","l4","l5","l6","l7","l8"];
+
+ids.forEach((id,i)=>{
+    document.getElementById(id).innerText=linii[i];
+});
+
+document.getElementById("overlay").classList.add("show");
+
+ids.forEach((id,i)=>{
+    setTimeout(()=>{
+        document.getElementById(id).classList.add("show");
+    }, i*250);
+});
+
+}
+
+// EMAIL
+function finalizare(){
+
+let nume=document.getElementById("nume").value;
+let tel=document.getElementById("prefix").value + document.getElementById("telefon").value;
+
+let serviciu=localStorage.getItem("serviciu");
+let pret=localStorage.getItem("pret");
+
+emailjs.send("SERVICE_ID","TEMPLATE_ID",{
+    nume:nume,
+    telefon:tel,
+    serviciu:serviciu,
+    total:pret,
+    plata:plata,
+    livrare:livrare
+})
+.then(()=>alert("Trimis!"));
+
+}
+</script>
+
+</body>
+</html>
