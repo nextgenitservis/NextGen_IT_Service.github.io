@@ -1,1 +1,1 @@
-nextgen-it-service.github.io
+https://nextgenitservis.github.io/NextGen_IT_Service.github.io/
